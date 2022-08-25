@@ -1,0 +1,41 @@
+from pathlib import Path
+from typing import Sequence, Callable, Union, Dict, Tuple, Any, List
+
+import torch
+from infer import swin_unetr_click_tooth_segmentater, BBox3D, DetectResult3D, Image3D, Point3D
+
+from monailabel.interfaces.tasks.infer import InferTask
+
+
+class SwinUnetrClickToothSegmentation(InferTask):
+    def __int__(self, path, network, type, labels, dimension, description):
+        super().__init__(path=path,
+                         network=network,
+                         type=type,
+                         labels=labels,
+                         dimension=dimension,
+                         description=description)
+
+    def pre_transforms(self, data=None) -> Sequence[Callable]:
+        return swin_unetr_click_tooth_segmentater.get_pre_transforms()
+
+    def post_transforms(self, data=None) -> Sequence[Callable]:
+        return swin_unetr_click_tooth_segmentater.get_post_transforms()
+
+    def __call__(self, request) -> Union[Dict, Tuple[str, Dict[str, Any]]]:
+        """
+        重写call方法，自行推理
+        """
+        image = Image3D.from_file(Path(request["image"]))
+        click: List[int] = request["tooth"][-1]
+        center = Point3D(x=click[0], y=click[1], z=click[2])
+        point1 = center.offset(-48, -48, -48)
+        point7 = center.offset(48, 48, 48)
+        result = swin_unetr_click_tooth_segmentater.infer(image=image,
+                                                          detect_result=DetectResult3D(bbox=BBox3D(point1=point1,
+                                                                                                   point7=point7)))
+        seg = Image3D(torch.argmax(result, dim=0))
+        output_file = Path("/tmp/seg.nii.gz")
+        seg.save(output_file)
+        return str(output_file), {"label_names": self.labels}
+

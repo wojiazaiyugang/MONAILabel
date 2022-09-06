@@ -123,13 +123,22 @@ Following are the optional dependencies which can help you to accelerate some GP
 These dependencies are by-default available if you are using `projectmonai/monailabel` docker.
 - [CUCIM](https://pypi.org/project/cucim/)
 - [CUPY](https://docs.cupy.dev/en/stable/install.html#installing-cupy)
+- [CUDA Toolkit](https://developer.nvidia.com/cuda-downloads)
+```bash
+  # Example:: Installing CUDA + CUPY + CUCIM For Linux
+  wget https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda_11.7.0_515.43.04_linux.run
+  sudo sh cuda_11.7.0_515.43.04_linux.run --silent --toolkit
+
+  export LD_LIBRARY_PATH=/usr/local/cuda/lib64
+  pip install cupy-cuda11x cucim
+```
 
 ## Plugins
 
 ### [3D Slicer](https://download.slicer.org/) (radiology)
 
-Download **Preview Release** from https://download.slicer.org/ and install MONAI Label plugin from Slicer Extension
-Manager.
+Download and install 3D Slicer with the [installation page](https://docs.monai.io/projects/label/en/latest/installation.html).
+Install MONAI Label plugin from Slicer Extension Manager.
 
 Refer [3D Slicer plugin](https://github.com/Project-MONAI/MONAILabel/tree/main/plugins/slicer) for other options to
 install and run MONAI Label plugin in 3D Slicer.

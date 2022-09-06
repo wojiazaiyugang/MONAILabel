@@ -161,21 +161,22 @@ def main():
         level=logging.INFO,
         format="[%(asctime)s] [%(process)s] [%(threadName)s] [%(levelname)s] (%(name)s:%(lineno)d) - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
+        force=True,
     )
 
-    run_train = False
     home = str(Path.home())
     studies = f"{home}/Datasets/Pathology"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--studies", default=studies)
+    parser.add_argument("-t", "--train", default=False)
     args = parser.parse_args()
 
     app_dir = os.path.dirname(__file__)
     studies = args.studies
 
     app = MyApp(app_dir, studies, {"roi_size": "[1024,1024]", "preload": "true"})
-    if run_train:
+    if args.train:
         train_nuclick(app)
     else:
         # infer_nuclick(app)

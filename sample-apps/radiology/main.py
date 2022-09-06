@@ -17,6 +17,8 @@ from typing import Dict
 
 import lib.configs
 from lib.activelearning import First
+from lib.infers.deepgrow_pipeline import InferDeepgrowPipeline
+from lib.infers.vertebra_pipeline import InferVertebraPipeline
 
 import monailabel
 from monailabel.interfaces.app import MONAILabelApp
@@ -28,8 +30,6 @@ from monailabel.interfaces.tasks.strategy import Strategy
 from monailabel.interfaces.tasks.train import TrainTask
 from monailabel.scribbles.infer import GMMBasedGraphCut, HistogramBasedGraphCut
 from monailabel.tasks.activelearning.random import Random
-from monailabel.tasks.infer.deepgrow_pipeline import InferDeepgrowPipeline
-from monailabel.tasks.infer.vertebra_pipeline import InferVertebraPipeline
 from monailabel.utils.others.class_utils import get_class_names
 from monailabel.utils.others.planner import HeuristicPlanner
 
@@ -164,9 +164,9 @@ class MyApp(MONAILabelApp):
             and infers.get("segmentation_vertebra")
         ):
             infers["vertebra_pipeline"] = InferVertebraPipeline(
-                model_localization_spine=infers["localization_spine"],  # first stage
-                model_localization_vertebra=infers["localization_vertebra"],  # second stage
-                model_segmentation_vertebra=infers["segmentation_vertebra"],  # third stage
+                task_loc_spine=infers["localization_spine"],  # first stage
+                task_loc_vertebra=infers["localization_vertebra"],  # second stage
+                task_seg_vertebra=infers["segmentation_vertebra"],  # third stage
                 description="Combines three stage for vertebra segmentation",
             )
         logger.info(infers)
@@ -244,14 +244,15 @@ def main():
         level=logging.INFO,
         format="[%(asctime)s] [%(process)s] [%(threadName)s] [%(levelname)s] (%(name)s:%(lineno)d) - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
+        force=True,
     )
 
     home = str(Path.home())
-    studies = f"{home}/Documents/workspace/Datasets/radiology/VerSe2020/test"
+    studies = f"{home}/Dataset/Radiology"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--studies", default=studies)
-    parser.add_argument("-m", "--model", default="all")
+    parser.add_argument("-m", "--model", default="localization_spine,localization_vertebra,segmentation_vertebra")
     parser.add_argument("-t", "--test", default="infer", choices=("train", "infer"))
     args = parser.parse_args()
 
@@ -259,7 +260,7 @@ def main():
     studies = args.studies
     conf = {
         "models": args.model,
-        "preload": "true",
+        "preload": "false",
     }
 
     app = MyApp(app_dir, studies, conf)
@@ -287,6 +288,7 @@ def main():
             print(label_json)
             print(f"++++ Image File: {image_path}")
             print(f"++++ Label File: {label_file}")
+            break
         return
 
     # Train

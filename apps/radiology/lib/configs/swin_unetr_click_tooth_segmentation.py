@@ -20,8 +20,13 @@ class SwinUnetrClickToothSegmentation(TaskConfig):
 
         self.labels = {
             "background": 0,
-            "tooth": 1
         }
+
+        for area in range(1, 9):  # 牙齿象限1-8
+            for tooth_index in range(1, 9):
+                if area >= 5 and tooth_index >= 6:
+                    continue
+                self.labels[f"tooth_{area}{tooth_index}"] = area * 10 + tooth_index
 
         self.path = [
             str(swin_unetr_click_tooth_segmentater.model_config.model_file),
@@ -36,7 +41,7 @@ class SwinUnetrClickToothSegmentation(TaskConfig):
     def infer(self) -> Union[InferTask, Dict[str, InferTask]]:
         return SwinUnetrClickToothSegmentationInferTask(path=self.path,
                                                         network=self.network,
-                                                        type=InferType.DEEPEDIT,
+                                                        type=InferType.DEEPGROW,
                                                         labels=self.labels,
                                                         dimension=3,
                                                         description="A SwinUnetrClickToothSegmentation")

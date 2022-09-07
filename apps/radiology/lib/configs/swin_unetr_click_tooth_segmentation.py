@@ -4,9 +4,8 @@ from typing import Dict, Any, Union, Optional
 from monailabel.interfaces.config import TaskConfig
 from monailabel.interfaces.tasks.infer import InferTask, InferType
 from apps.radiology.lib.infers.swin_unetr_click_tooth_segmentation import \
-    SwinUnetrClickToothSegmentation as SwinUnetrClickToothSegmentationInferTask
+    SwinUnetrClickToothSegmentation as SwinUnetrClickToothSegmentationInferTask, model
 
-from infer import swin_unetr_click_tooth_segmentater
 
 from monailabel.interfaces.tasks.train import TrainTask
 
@@ -29,11 +28,11 @@ class SwinUnetrClickToothSegmentation(TaskConfig):
                 self.labels[f"tooth_{area}{tooth_index}"] = area * 10 + tooth_index
 
         self.path = [
-            str(swin_unetr_click_tooth_segmentater.model_config.model_file),
+            str(model.model_config.model_file),
             str(Path(self.model_dir).joinpath("swin_unetr_click_tooth_segmentater_publish.pth"))
         ]
 
-        self.network = swin_unetr_click_tooth_segmentater.model
+        self.network = model.model
 
     def trainer(self) -> Optional[TrainTask]:
         return None

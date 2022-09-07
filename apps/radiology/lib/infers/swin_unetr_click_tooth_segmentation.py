@@ -32,7 +32,10 @@ class SwinUnetrClickToothSegmentation(InferTask):
         """
         image = Image3D.from_path(Path(request["image"]))
         click: List[int] = request["foreground"][-1]
-        center = Point3D(x=click[0], y=click[1], z=click[2])
+        image_spacing = image.spacing
+        model_spacing = model.model_config.spacing
+        ratio = [image_spacing[0] / model_spacing[0], image_spacing[1] / model_spacing[1], image_spacing[2] / model_spacing[2]]
+        center = Point3D(x=click[0] * ratio[0], y=click[1] * ratio[1], z=click[2] * ratio[2]).to_int()
         point1 = center.offset(-model.model_config.image_size[0] // 2,
                                -model.model_config.image_size[1] // 2,
                                -model.model_config.image_size[2] // 2)

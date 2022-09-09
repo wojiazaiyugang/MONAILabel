@@ -16,8 +16,8 @@ class DeepEditToothInstanceSegmentation(InferTask):
             type=InferType.DEEPEDIT,
             labels=None,
             dimension=3,
-            spatial_size=(128, 128, 64),
-            target_spacing=(1.0, 1.0, 1.0),
+            spatial_size=(160, 160, 160),
+            target_spacing=(0.25, 0.25, 0.25),
             description="A DeepEdit model for volumetric (3D) segmentation over 3D Images",
             **kwargs,
     ):

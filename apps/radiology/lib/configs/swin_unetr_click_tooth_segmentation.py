@@ -26,6 +26,7 @@ class SwinUnetrClickToothSegmentation(TaskConfig):
                 if area >= 5 and tooth_index >= 6:
                     continue
                 self.labels[f"tooth_{area}{tooth_index}"] = area * 10 + tooth_index
+        self.labels["tooth_unkonwn"] = 100
 
         self.path = [
             str(model.model_config.model_file),

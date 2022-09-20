@@ -11,13 +11,12 @@
 
 import logging
 import os
-from distutils.util import strtobool
 from typing import Any, Dict, Optional, Union
 
 import lib.infers
 import lib.trainers
-from lib.net.ranzcrnet import RanzcrNetV2
 from lib.scoring.cvat import CVATEpistemicScoring
+from monai.networks.nets import FlexibleUNet
 
 from monailabel.interfaces.config import TaskConfig
 from monailabel.interfaces.tasks.infer import InferTask
@@ -25,7 +24,7 @@ from monailabel.interfaces.tasks.scoring import ScoringMethod
 from monailabel.interfaces.tasks.strategy import Strategy
 from monailabel.interfaces.tasks.train import TrainTask
 from monailabel.tasks.activelearning.epistemic import Epistemic
-from monailabel.utils.others.generic import download_file
+from monailabel.utils.others.generic import download_file, strtobool
 
 logger = logging.getLogger(__name__)
 
@@ -47,11 +46,29 @@ class ToolTracking(TaskConfig):
         # Download PreTrained Model
         if strtobool(self.conf.get("use_pretrained_model", "true")):
             url = f"{self.conf.get('pretrained_path', self.PRE_TRAINED_PATH)}/endoscopy_tooltracking.pt"
-            download_file(url, self.path[0])
+            try:
+                download_file(url, self.path[0])
+            except:
+                logger.warning(f"Failed to download pre-trained model from {url}; Ignoring the same...")
 
         # Network
-        self.network = RanzcrNetV2(in_channels=3, out_channels=2, backbone="efficientnet-b0")
-        self.network_with_dropout = RanzcrNetV2(in_channels=3, out_channels=2, backbone="efficientnet-b0", dropout=0.2)
+        self.network = FlexibleUNet(
+            in_channels=3,
+            out_channels=2,
+            backbone="efficientnet-b0",
+            spatial_dims=2,
+            is_pad=True,
+            pretrained=True,
+        )
+        self.network_with_dropout = FlexibleUNet(
+            in_channels=3,
+            out_channels=2,
+            backbone="efficientnet-b0",
+            spatial_dims=2,
+            is_pad=True,
+            pretrained=True,
+            dropout=0.2,
+        )
 
         # Others
         self.epistemic_enabled = strtobool(conf.get("epistemic_enabled", "false"))
@@ -108,6 +125,7 @@ class ToolTracking(TaskConfig):
                     labels=self.labels,
                     train_mode=True,
                     skip_writer=True,
+                    find_contours=False,
                 ),
                 function="monailabel.endoscopy.tooltracking",
                 max_samples=self.epistemic_max_samples,

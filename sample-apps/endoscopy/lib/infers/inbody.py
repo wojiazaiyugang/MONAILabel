@@ -15,7 +15,7 @@ from typing import Any, Callable, Dict, Sequence
 import numpy as np
 import torch
 from monai.inferers import Inferer, SimpleInferer
-from monai.transforms import AsChannelFirstd, AsDiscreted, CastToTyped, EnsureTyped, NormalizeIntensityd, Resized
+from monai.transforms import AsChannelFirstd, AsDiscreted, CastToTyped, NormalizeIntensityd, Resized
 
 from monailabel.interfaces.tasks.infer import InferTask, InferType
 from monailabel.transform.pre import LoadImageExd
@@ -24,7 +24,7 @@ from monailabel.transform.writer import ClassificationWriter
 logger = logging.getLogger(__name__)
 
 
-class DeID(InferTask):
+class InBody(InferTask):
     """
     This provides Inference Engine for pre-trained segmentation model for Tool Tracking.
     """
@@ -36,7 +36,7 @@ class DeID(InferTask):
         type=InferType.CLASSIFICATION,
         labels=None,
         dimension=2,
-        description="A pre-trained semantic classification model for DeID",
+        description="A pre-trained semantic classification model for InBody/OutBody",
         **kwargs,
     ):
         super().__init__(
@@ -57,7 +57,6 @@ class DeID(InferTask):
     def pre_transforms(self, data=None) -> Sequence[Callable]:
         return [
             LoadImageExd(keys="image", dtype=np.uint8),
-            EnsureTyped(keys="image", device=data.get("device") if data else None),
             AsChannelFirstd(keys="image"),
             Resized(keys="image", spatial_size=(256, 256), mode="bilinear"),
             CastToTyped(keys="image", dtype=torch.float32),
@@ -69,7 +68,6 @@ class DeID(InferTask):
 
     def post_transforms(self, data=None) -> Sequence[Callable]:
         return [
-            EnsureTyped(keys="pred", device=data.get("device") if data else None),
             AsDiscreted(keys="pred", argmax=True, to_onehot=2),
         ]
 

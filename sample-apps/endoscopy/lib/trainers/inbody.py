@@ -38,13 +38,13 @@ from monailabel.tasks.train.basic_train import BasicTrainTask, Context
 logger = logging.getLogger(__name__)
 
 
-class DeID(BasicTrainTask):
+class InBody(BasicTrainTask):
     def __init__(
         self,
         model_dir,
         network,
         labels,
-        description="Endoscopy Classification for DeID",
+        description="Endoscopy Classification for InBody/OutBody",
         **kwargs,
     ):
         self._network = network
@@ -63,7 +63,7 @@ class DeID(BasicTrainTask):
     def train_pre_transforms(self, context: Context):
         return [
             LoadImaged(keys=("image", "label"), dtype=np.uint8),
-            LabelToBinaryClassd(keys="label"),
+            LabelToBinaryClassd(keys="label", offset=2),
             ToTensord(keys=("image", "label")),
             AsChannelFirstd("image"),
             Resized(keys="image", spatial_size=(256, 256), mode="bilinear"),
@@ -84,7 +84,7 @@ class DeID(BasicTrainTask):
     def val_pre_transforms(self, context: Context):
         return [
             LoadImaged(keys=("image", "label"), dtype=np.uint8),
-            LabelToBinaryClassd(keys="label"),
+            LabelToBinaryClassd(keys="label", offset=2),
             ToTensord(keys=("image", "label")),
             AsChannelFirstd("image"),
             Resized(keys="image", spatial_size=(256, 256), mode="bilinear"),

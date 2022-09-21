@@ -12,7 +12,6 @@
 import logging
 import os
 from datetime import timedelta
-from distutils.util import strtobool
 from typing import Dict
 
 import lib.configs
@@ -31,7 +30,7 @@ from monailabel.interfaces.tasks.strategy import Strategy
 from monailabel.interfaces.tasks.train import TrainTask
 from monailabel.tasks.activelearning.random import Random
 from monailabel.utils.others.class_utils import get_class_names
-from monailabel.utils.others.generic import create_dataset_from_path
+from monailabel.utils.others.generic import create_dataset_from_path, strtobool
 
 logger = logging.getLogger(__name__)
 
@@ -104,8 +103,9 @@ class MyApp(MONAILabelApp):
                 project=self.conf.get("cvat_project", "MONAILabel"),
                 task_prefix=self.conf.get("cvat_task_prefix", "ActiveLearning_Iteration"),
                 image_quality=int(self.conf.get("cvat_image_quality", "70")),
-                labels=self.conf.get("cvat_labels", '[{"name": "Tool", "attributes": [], "color": "#66ff66"}]'),
+                labels=self.conf.get("cvat_labels"),
                 normalize_label=strtobool(self.conf.get("cvat_normalize_label", "true")),
+                segment_size=int(self.conf.get("cvat_segment_size", "1")),
                 extensions=settings.MONAI_LABEL_DATASTORE_FILE_EXT,
                 auto_reload=settings.MONAI_LABEL_DATASTORE_AUTO_RELOAD,
             )
@@ -237,6 +237,7 @@ def main():
 
     home = str(Path.home())
     studies = f"{home}/Dataset/Holoscan/tiny/images"
+    # studies = f"{home}/Dataset/picked/all"
     # studies = f"{home}/Dataset/Holoscan/flattened/images"
     # studies = f"{home}/Dataset/Holoscan/tiny_flat/images"
 
@@ -247,9 +248,10 @@ def main():
     app_dir = os.path.dirname(__file__)
     studies = args.studies
 
-    app = MyApp(app_dir, studies, {"preload": "false", "models": "deid"})
+    app = MyApp(app_dir, studies, {"preload": "true", "models": "deepedit"})
     logger.info(app.datastore().status())
-    infer_deid(app)
+    for _ in range(3):
+        infer_deepedit(app)
 
 
 def randamize_ds(train_datalist, val_datalist):
@@ -381,23 +383,24 @@ def infer_tooltracking(app):
     logger.info("All Done!")
 
 
-def infer_deid(app):
+def infer_inbody(app):
     import json
 
     res = app.infer(
         request={
-            "model": "deid",
-            "image": "Video_8_2020_01_13_Video2_Trim_01-25_f26100",
+            "model": "inbody",
+            "image": "Video_8_2020_01_13_Video2_Trim_01-25_f10200",
+            # "logging": "ERROR",
         }
     )
 
-    print(json.dumps(res, indent=2))
+    print(json.dumps(res["params"]["prediction"]))
 
 
-def train_deid(app):
+def train_inbody(app):
     res = app.train(
         request={
-            "model": "deid",
+            "model": "inbody",
             "max_epochs": 10,
             "dataset": "Dataset",  # PersistentDataset, CacheDataset
             "train_batch_size": 1,

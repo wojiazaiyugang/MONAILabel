@@ -1,9 +1,12 @@
+import shutil
 from pathlib import Path
 from typing import Sequence, Callable, Union, Dict, Tuple, Any, List
 
+import torch
 from infer import Image3D, Point3D, click_tooth_segmentation_swin_unetr
 
 from monailabel.interfaces.tasks.infer import InferTask
+from monailabel.interfaces.tasks.infer import InferType
 
 model = click_tooth_segmentation_swin_unetr
 
@@ -27,14 +30,24 @@ class SwinUnetrClickToothSegmentation(InferTask):
         """
         重写call方法，自行推理
         """
+        image_path = Path(request["image"])
         image = Image3D.from_path(Path(request["image"]))
-        click: List[int] = request["foreground"][-1]
-        center = Point3D(x=click[0], y=click[1], z=click[2]).to_int()
-        result = model.infer(image=image, click_point=center)
-        seg = Image3D(result[1])
-        seg.re_spacing(spacing=image.spacing, mode="bilinear")
-        seg.gaussian_smooth(sigma=1)
-        seg.as_discrete(threshold=0.5)
         output_file = Path("/tmp/seg.nii.gz")
-        seg.save(output_file)
+        if self.type == InferType.SEGMENTATION:
+            init_label_path = image_path.parent.joinpath("labels").joinpath("final").joinpath(image_path.name)
+            if init_label_path.exists():
+                shutil.copy(init_label_path, output_file)
+            else:
+                # 生成一个空的标签
+                empty_label = Image3D(torch.zeros((10, 10, 10), dtype=torch.int64))
+                empty_label.save(output_file)
+        elif self.type == InferType.DEEPGROW:
+            click: List[int] = request["foreground"][-1]
+            center = Point3D(x=click[0], y=click[1], z=click[2]).to_int()
+            result = model.infer(image=image, click_point=center)
+            seg = Image3D(result[1])
+            seg.re_spacing(spacing=image.spacing, mode="bilinear")
+            seg.gaussian_smooth(sigma=1)
+            seg.as_discrete(threshold=0.5)
+            seg.save(output_file)
         return str(output_file), {"label_names": self.labels}

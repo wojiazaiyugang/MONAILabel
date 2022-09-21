@@ -32,6 +32,7 @@ from monailabel.tasks.infer.deepgrow_pipeline import InferDeepgrowPipeline
 from monailabel.tasks.infer.vertebra_pipeline import InferVertebraPipeline
 from monailabel.utils.others.class_utils import get_class_names
 from monailabel.utils.others.planner import HeuristicPlanner
+from apps.radiology.stragegy import Order
 
 logger = logging.getLogger(__name__)
 
@@ -188,6 +189,7 @@ class MyApp(MONAILabelApp):
 
     def init_strategies(self) -> Dict[str, Strategy]:
         strategies: Dict[str, Strategy] = {
+            "order": Order(),
             "random": Random(),
             "first": First(),
         }

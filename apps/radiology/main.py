@@ -193,7 +193,7 @@ class MyApp(MONAILabelApp):
             "next": order,
             "last": order,
             # "random": Random(),
-            # "first": First(),
+            "first": order,
         }
 
         if strtobool(self.conf.get("skip_strategies", "true")):

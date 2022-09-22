@@ -29,9 +29,13 @@ class Order(Strategy):
         super().__init__("顺序读取数据")
 
     def __call__(self, request, datastore: Datastore):
+        strategy = request.get("strategy")
+        offset = 1 if strategy == "next" else -1
         images = list(sorted(datastore.get_unlabeled_images() + datastore.get_labeled_images()))
-        index = self.index + 1
+        index = self.index + offset
         if index >= len(images):
             index = 0
+        if index < 0:
+            index = len(images) - 1
         self.index = index
         return images[index]

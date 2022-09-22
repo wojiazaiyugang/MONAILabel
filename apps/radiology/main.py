@@ -188,10 +188,12 @@ class MyApp(MONAILabelApp):
         return trainers
 
     def init_strategies(self) -> Dict[str, Strategy]:
+        order = Order()
         strategies: Dict[str, Strategy] = {
-            "order": Order(),
-            "random": Random(),
-            "first": First(),
+            "next": order,
+            "last": order,
+            # "random": Random(),
+            # "first": First(),
         }
 
         if strtobool(self.conf.get("skip_strategies", "true")):

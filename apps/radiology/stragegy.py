@@ -10,8 +10,6 @@
 # limitations under the License.
 
 import logging
-import random
-import time
 
 from monailabel.interfaces.datastore import Datastore
 from monailabel.interfaces.tasks.strategy import Strategy
@@ -32,13 +30,13 @@ class Order(Strategy):
         strategy = request.get("strategy")
         images = list(sorted(datastore.get_unlabeled_images() + datastore.get_labeled_images()))
         if strategy == "next":
+            if self.index + 1 >= len(images):
+                return None
             self.index += 1
-            if self.index >= len(images):
-                self.index = 0
         elif strategy == "last":
+            if self.index - 1 < 0:
+                return None
             self.index -= 1
-            if self.index < 0:
-                self.index = len(images) - 1
         elif strategy == "first":
             self.index = 0
         print(f"选择样本{self.index+1}/{len(images)}")

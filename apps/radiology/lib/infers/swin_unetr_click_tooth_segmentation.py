@@ -45,9 +45,6 @@ class SwinUnetrClickToothSegmentation(InferTask):
             click: List[int] = request["foreground"][-1]
             center = Point3D(x=click[0], y=click[1], z=click[2]).to_int()
             result = model.infer(image=image, click_point=center)
-            seg = Image3D(result[1])
-            seg.re_spacing(spacing=image.spacing, mode="bilinear")
-            seg.gaussian_smooth(sigma=1)
-            seg.as_discrete(threshold=0.5)
+            seg = Image3D(result[1]).re_spacing(spacing=image.spacing, mode="bilinear").gaussian_smooth(sigma=1).as_discrete(threshold=0.5)
             seg.save(output_file)
         return str(output_file), {"label_names": self.labels}

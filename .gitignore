@@ -14,8 +14,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
 *.so
+!/XiaoLiuInfer/infer.cpython-38-x86_64-linux-gnu.so
+/XiaoLiuInfer/models/
 
 # Distribution / packaging
 .Python

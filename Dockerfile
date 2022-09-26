@@ -14,9 +14,9 @@
 # to use different version of MONAI pass `--build-arg MONAI_IMAGE=...`
 # to exclude ORTHANC pass `--build-arg ORTHANC=false`
 
-ARG MONAI_IMAGE=projectmonai/monai:1.0.0
+ARG MONAI_IMAGE=wojiazaiyugang/xiaoliu-infer
 ARG ORTHANC=false
-ARG BUILD_OHIF=true
+ARG BUILD_OHIF=false
 
 FROM ${MONAI_IMAGE} as build
 LABEL maintainer="monai.contact@gmail.com"

@@ -65,5 +65,5 @@ class Order(Strategy):
         for index, image_id in enumerate(image_ids):
             image_file = Path(datastore.get_image_info(image_id)["path"])
             label_file = image_file.parent.joinpath("labels").joinpath("final").joinpath(image_file.name)
-            self.extra_info += self.pad_string(f"""{"=>" if index == self.index else ". "} 第{index+1}份样本({image_file.name:75})：{"已标注" if label_file.exists() else "未标注"} {"标注时间:" + str(datetime.fromtimestamp(os.path.getmtime(label_file))) if label_file.exists() else ""} """)
+            self.extra_info += self.pad_string(f"""{"=>" if index == self.index else ". "} 第{index+1:^3}份样本({image_file.name:75})：{"已标注" if label_file.exists() else "未标注"} {"标注时间:" + str(datetime.fromtimestamp(os.path.getmtime(label_file))) if label_file.exists() else ""} """)
         return select_image_id

@@ -47,3 +47,4 @@ RUN if [ "${ORTHANC}" = "true" ] ; then  \
     && wget https://lsb.orthanc-server.com/orthanc/1.9.6/libModalityWorklists.so --output-document /usr/share/orthanc/plugins/libModalityWorklists.so \
     && wget https://lsb.orthanc-server.com/plugin-dicom-web/1.6/libOrthancDicomWeb.so --output-document /usr/share/orthanc/plugins/libOrthancDicomWeb.so \
     && service orthanc restart; fi
+RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone

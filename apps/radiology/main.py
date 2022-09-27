@@ -190,8 +190,8 @@ class MyApp(MONAILabelApp):
     def init_strategies(self) -> Dict[str, Strategy]:
         order = Order()
         strategies: Dict[str, Strategy] = {
-            "Previous": order,
             "Next": order,
+            "Previous": order,
             "First": order,
             "Last": order,
         }

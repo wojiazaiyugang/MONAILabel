@@ -456,9 +456,11 @@ class MONAILabelApp:
         if self._auto_update_scoring:
             self.async_scoring(None)
 
+        extra_info = getattr(task, "extra_info", "")
         return {
             "id": image_id,
             "path": image_path,
+            "extra_info": extra_info,
         }
 
     def on_init_complete(self):

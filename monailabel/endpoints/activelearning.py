@@ -55,6 +55,7 @@ def sample(strategy: str, params: Optional[dict] = None, user: Optional[str] = N
     result = {
         "id": image_id,
         **image_info,
+        "extra_info": result["extra_info"]
     }
     logger.info(f"Next sample: {result}")
     return result

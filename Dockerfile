@@ -14,6 +14,9 @@
 # to use different version of MONAI pass `--build-arg MONAI_IMAGE=...`
 # to exclude ORTHANC pass `--build-arg ORTHANC=false`
 
+# 启动命令
+# sudo docker run --restart=always --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --gpus all -p 8000:8000 -v /media/3TB/data/xiaoliutech/annotation/:/data -v /home/yujiannan/Projects/MONAILabel/:/workspace/MONAILabel -e PYTHONPATH=/workspace/MONAILabel/:/workspace/MONAILabel/XiaoLiuInfer wojiazaiyugang/monai-label python /workspace/MONAILabel/monailabel/main.py start_server --app /workspace/MONAILabel/apps/radiology --studies /data --conf models swin_unetr_click_tooth_segmentation
+
 ARG MONAI_IMAGE=wojiazaiyugang/xiaoliu-infer
 ARG ORTHANC=false
 ARG BUILD_OHIF=false

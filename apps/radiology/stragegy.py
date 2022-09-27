@@ -29,15 +29,17 @@ class Order(Strategy):
     def __call__(self, request, datastore: Datastore):
         strategy = request.get("strategy")
         images = list(sorted(datastore.get_unlabeled_images() + datastore.get_labeled_images()))
-        if strategy == "next":
+        if strategy == "Next":
             if self.index + 1 >= len(images):
                 return None
             self.index += 1
-        elif strategy == "last":
+        elif strategy == "Previous":
             if self.index - 1 < 0:
                 return None
             self.index -= 1
-        elif strategy == "first":
+        elif strategy == "First":
             self.index = 0
-        print(f"选择样本{self.index+1}/{len(images)}")
+        elif strategy == "Last":
+            self.index = len(images) - 1
+        print(f"选择样本{self.index+1}/{len(images)} => {images[self.index]}")
         return images[self.index]

@@ -24,6 +24,8 @@ ARG BUILD_OHIF=false
 FROM ${MONAI_IMAGE} as build
 LABEL maintainer="monai.contact@gmail.com"
 
+COPY Shanghai /etc/localtime/
+RUN echo 'Asia/Shanghai' >/etc/timezone
 ADD . /opt/monailabel/
 RUN apt update -y && apt install openslide-tools npm -y && npm install --global yarn
 RUN python -m pip install --upgrade --no-cache-dir pip setuptools wheel twine \
@@ -47,4 +49,3 @@ RUN if [ "${ORTHANC}" = "true" ] ; then  \
     && wget https://lsb.orthanc-server.com/orthanc/1.9.6/libModalityWorklists.so --output-document /usr/share/orthanc/plugins/libModalityWorklists.so \
     && wget https://lsb.orthanc-server.com/plugin-dicom-web/1.6/libOrthancDicomWeb.so --output-document /usr/share/orthanc/plugins/libOrthancDicomWeb.so \
     && service orthanc restart; fi
-RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone

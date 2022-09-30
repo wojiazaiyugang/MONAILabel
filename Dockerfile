@@ -15,7 +15,7 @@
 # to exclude ORTHANC pass `--build-arg ORTHANC=false`
 
 # 启动命令
-# sudo docker run --restart=always --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -it --gpus all -p 8000:8000 -v /media/3TB/data/xiaoliutech/annotation/:/data -v /home/yujiannan/Projects/MONAILabel/:/workspace/MONAILabel -e PYTHONPATH=/workspace/MONAILabel/:/workspace/MONAILabel/XiaoLiuInfer wojiazaiyugang/monai-label python /workspace/MONAILabel/monailabel/main.py start_server --app /workspace/MONAILabel/apps/radiology --studies /data --conf models swin_unetr_click_tooth_segmentation
+# sudo docker run --restart=always --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 -itd --gpus 0 -p 8000:8000 -v /home/yujiannan/Projects/MONAILabel/:/workspace/MONAILabel -e PYTHONPATH=/workspace/MONAILabel/:/workspace/MONAILabel/XiaoLiuInfer wojiazaiyugang/monai-label python /workspace/MONAILabel/monailabel/main.py start_server --app /workspace/MONAILabel/apps/radiology --studies /workspace/MONAILabel/data --conf models swin_unetr_click_tooth_segmentation
 
 ARG MONAI_IMAGE=wojiazaiyugang/xiaoliu-infer
 ARG ORTHANC=false

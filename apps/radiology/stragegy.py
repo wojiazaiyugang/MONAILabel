@@ -33,7 +33,7 @@ class Order(Strategy):
 
     @staticmethod
     def pad_string(s: str) -> str:
-        return s + " " * (150 - len(s))
+        return s + " " * (300 - len(s))
 
     def __call__(self, request, datastore: Datastore):
         strategy = request.get("strategy")
@@ -64,6 +64,7 @@ class Order(Strategy):
         self.extra_info += self.pad_string(f"所有数据标注状态:")
         for index, image_id in enumerate(image_ids):
             image_file = Path(datastore.get_image_info(image_id)["path"])
+            pre_label_file = image_file.parent.joinpath("labels").joinpath("pre").joinpath(image_file.name)
             label_file = image_file.parent.joinpath("labels").joinpath("final").joinpath(image_file.name)
-            self.extra_info += self.pad_string(f"""{"=>" if index == self.index else ". "} 第{index+1:^3}份样本({image_file.name:75})：{"已标注" if label_file.exists() else "未标注"} {"标注时间:" + str(datetime.fromtimestamp(os.path.getmtime(label_file))) if label_file.exists() else ""} """)
+            self.extra_info += self.pad_string(f"""{"=>" if index == self.index else ". "} 第{index+1:^3}份样本({image_file.name:75})：{"已标注" if label_file.exists() else "未标注已预处理" if pre_label_file.exists() else "未预处理"} {"标注时间:" + str(datetime.fromtimestamp(os.path.getmtime(label_file))) if label_file.exists() else ""} """)
         return select_image_id

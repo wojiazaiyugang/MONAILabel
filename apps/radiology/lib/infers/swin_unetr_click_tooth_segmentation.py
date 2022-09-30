@@ -33,11 +33,18 @@ class SwinUnetrClickToothSegmentation(InferTask):
         image_path = Path(request["image"])
         image = Image3D.from_path(Path(request["image"]))
         output_file = Path("/tmp/seg.nii.gz")
+        msg = ""
         if self.type == InferType.SEGMENTATION:
-            init_label_path = image_path.parent.joinpath("labels").joinpath("final").joinpath(image_path.name)
+            init_label_path = image_path.parent.joinpath("labels").joinpath("final").joinpath(image_path.name)  # 已有的分割结果
+            pre_label_path = image_path.parent.joinpath("labels").joinpath("pre").joinpath(image_path.name)  # 预分割结果
             if init_label_path.exists():
+                msg = "已有分割结果，直接返回"
                 shutil.copy(init_label_path, output_file)
+            elif pre_label_path.exists():
+                msg = "没有分割结果，返回预分割结果"
+                shutil.copy(pre_label_path, output_file)
             else:
+                msg = "没有预分割结果，返回空空标签"
                 # 生成一个空的标签
                 empty_label = Image3D(torch.zeros((10, 10, 10), dtype=torch.int64))
                 empty_label.save(output_file)
@@ -47,4 +54,5 @@ class SwinUnetrClickToothSegmentation(InferTask):
             result = model.infer(image=image, click_point=center)
             seg = Image3D(result[1]).re_spacing(spacing=image.spacing, mode="bilinear").gaussian_smooth(sigma=1).as_discrete(threshold=0.5)
             seg.save(output_file)
+        print(f"图片{image_path} => {msg}")
         return str(output_file), {"label_names": self.labels}

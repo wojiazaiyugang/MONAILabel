@@ -20,12 +20,12 @@ class SwinUnetrClickToothSegmentation(TaskConfig):
             "background": 0,
         }
 
-        for area in range(1, 9):  # 牙齿象限1-8
+        for area in range(1, 5):  # 牙齿象限1-8
             for tooth_index in range(1, 9):
-                if area >= 5 and tooth_index >= 6:
-                    continue
+                # if area >= 5 and tooth_index >= 6:
+                #     continue
                 self.labels[f"tooth_{area}{tooth_index}"] = area * 10 + tooth_index
-        self.labels["tooth_unkonwn"] = 100
+        # self.labels["tooth_unknown"] = 100
 
         self.path = [
             str(model.model_config.model_file),

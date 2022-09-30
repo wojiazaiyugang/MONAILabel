@@ -5,6 +5,7 @@ from monailabel.interfaces.config import TaskConfig
 from monailabel.interfaces.tasks.infer import InferTask, InferType
 from apps.radiology.lib.infers.swin_unetr_click_tooth_segmentation import \
     SwinUnetrClickToothSegmentation as SwinUnetrClickToothSegmentationInferTask, model
+from apps.radiology.lib.infers.debug_infer import Debug as DebugInferTask
 
 from monailabel.interfaces.tasks.train import TrainTask
 
@@ -51,4 +52,10 @@ class SwinUnetrClickToothSegmentation(TaskConfig):
                                                              labels=self.labels,
                                                              dimension=3,
                                                              description="A SwinUnetrClickToothSegmentation"),
+            "debug": DebugInferTask(path=self.path,
+                                    network=self.network,
+                                    type=InferType.SEGMENTATION,
+                                    labels=self.labels,
+                                    dimension=3,
+                                    description="A SwinUnetrClickToothSegmentation")
         }
